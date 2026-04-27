@@ -1144,6 +1144,30 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                 </div>
               </div>
 
+              {/* ── Variante Culoare ── */}
+              <div className="flex gap-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 mt-4 mb-2">
+                <label className="flex items-center gap-2.5 cursor-pointer group">
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${config.hasColors ? 'bg-[#0077B6] border-[#0077B6]' : 'bg-white border-slate-300 group-hover:border-[#0077B6]'}`}>
+                    {config.hasColors && <span className="text-white text-xs">✓</span>}
+                  </div>
+                  <input type="checkbox" checked={config.hasColors || false} onChange={e => setConfig({ ...config, hasColors: e.target.checked })} className="hidden" />
+                  <span className="text-sm font-semibold text-slate-700">Produsul are mai multe culori?</span>
+                </label>
+              </div>
+              
+              {config.hasColors && (
+                <div className="p-4 border border-[#0077B6]/20 bg-[#0077B6]/5 rounded-xl mb-4">
+                  <FormInput 
+                    label="Culori Disponibile (separate prin virgulă) *" 
+                    name="colorsList" 
+                    value={config.colorsList || ''} 
+                    onChange={e => setConfig({ ...config, colorsList: e.target.value })} 
+                    placeholder="Ex: Roșu, Albastru, Negru Elegant" 
+                  />
+                  <p className="text-[11px] text-slate-500 mt-1">Clienții vor alege obligatoriu una din aceste culori pe pagină, și va fi trimisă în comandă.</p>
+                </div>
+              )}
+
               <div>
                 <label className="block text-sm font-semibold mb-1.5">Imagini Produs (pentru magazinul standard)</label>
                 <div className="flex flex-wrap gap-4 items-start">

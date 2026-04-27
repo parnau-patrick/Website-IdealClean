@@ -47,6 +47,7 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
       productId: product.id,
       productName: product.name,
       bundleLabel: currentBundle.label || '1x buc',
+      color: product.selectedColor || null,
       qty: currentBundle.qty || 1,
       price: currentBundle.price,
       originalUnitPrice: currentBundle.oldPrice ? (currentBundle.oldPrice / (currentBundle.qty || 1)) : (currentBundle.price / (currentBundle.qty || 1)),
@@ -144,6 +145,7 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
         productId: product.id,
         productName: product.name,
         bundleLabel: currentBundle.label || '1x buc',
+        color: product.selectedColor || null,
         qty: currentBundle.qty,
         price: currentBundle.price,
         originalUnitPrice: currentBundle.oldPrice ? (currentBundle.oldPrice / (currentBundle.qty || 1)) : (currentBundle.price / (currentBundle.qty || 1)),
@@ -186,7 +188,13 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
           <p className="text-slate-400 mb-2">Mulțumim, {form.name}!</p>
           <p className="text-slate-400 mb-6 text-sm">Vei fi contactat telefonic la <strong>{form.phone}</strong> pentru confirmarea comenzii.</p>
           <div className="bg-slate-50 rounded-2xl p-4 mb-6 text-left">
-            <div className="flex justify-between text-sm mb-1"><span className="text-slate-400">Produs</span><span className="font-semibold">{currentBundle.qty}x {product.name}</span></div>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-slate-400">Produs</span>
+              <span className="font-semibold text-right">
+                {currentBundle.qty}x {product.name}
+                {product.selectedColor && ` (${product.selectedColor})`}
+              </span>
+            </div>
             <div className="flex justify-between text-sm mb-1"><span className="text-slate-400">Total</span><span className="font-bold text-emerald-600">{total.toFixed(2)} lei</span></div>
             <div className="flex justify-between text-sm"><span className="text-slate-400">Plata</span><span className="font-semibold">Ramburs la livrare</span></div>
           </div>
@@ -316,6 +324,13 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
 
           {/* ─── Summary ─── */}
           <div className="bg-slate-50 rounded-2xl p-5 space-y-2.5">
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-400">Produs</span>
+              <span className="font-semibold text-slate-700 text-right">
+                {currentBundle.qty}x {product.name}
+                {product.selectedColor && <span className="block text-xs text-[#0077B6] mt-0.5">Culoare: {product.selectedColor}</span>}
+              </span>
+            </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-400">Subtotal</span>
               <span className="font-semibold text-slate-700">{subtotal.toFixed(2)} lei</span>

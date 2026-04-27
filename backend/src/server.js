@@ -232,12 +232,21 @@ async function createShopifyDraft(items, shipping, customer) {
     const numericId = vId && typeof vId === 'string' && vId.includes('/') ? vId.split('/').pop() : vId
     const label = item.bundleLabel ? ` (${item.bundleLabel})` : ''
 
-    if (numericId) return { variant_id: parseInt(numericId), quantity: item.qty || 1 }
-    return {
-      title: `${item.productName || 'Produs'}${label}`,
-      price: (item.price / (item.qty || 1)).toFixed(2),
-      quantity: item.qty || 1,
+    const payload = {}
+    if (numericId) {
+      payload.variant_id = parseInt(numericId)
+      payload.quantity = item.qty || 1
+    } else {
+      payload.title = `${item.productName || 'Produs'}${label}`
+      payload.price = (item.price / (item.qty || 1)).toFixed(2)
+      payload.quantity = item.qty || 1
     }
+
+    if (item.color) {
+      payload.properties = [{ name: 'Culoare', value: item.color }]
+    }
+
+    return payload
   })
 
   // Date client — adăugate la draft pentru a fi vizibile în Shopify Admin
@@ -412,6 +421,11 @@ async function createShopifyOrder(orderData) {
     } else {
       payload.title = `${item.productName || 'Produs'}${label}`
     }
+
+    if (item.color) {
+      payload.properties = [{ name: 'Culoare', value: item.color }]
+    }
+
     return payload
   })
 
