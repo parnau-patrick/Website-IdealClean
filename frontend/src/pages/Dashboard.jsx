@@ -819,7 +819,6 @@ function IntegrationsTab() {
               {openFields[intg.key] ? 'Ascunde' : 'Configurează'}
             </button>
           </div>
-          </div>
         ))}
 
         {/* Facebook Pixel Integration */}
