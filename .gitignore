@@ -20,3 +20,10 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Database & Secrets
+backend/data/
+backend/database.sqlite*
+*.db
+*.sqlite
+*.sqlite3

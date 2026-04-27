@@ -52,21 +52,35 @@ const SHOPIFY_STORE_URL = process.env.SHOPIFY_STORE_URL
 const SHOPIFY_CLIENT_ID = process.env.SHOPIFY_CLIENT_ID
 const SHOPIFY_CLIENT_SECRET = process.env.SHOPIFY_CLIENT_SECRET
 const SHOPIFY_API_VERSION = process.env.SHOPIFY_API_VERSION || '2024-04'
-const ENV_PATH = path.join(__dirname, '../.env')
+// Fișier persistent pentru token — în volumul Docker /app/data (supraviețuiește restart-urilor)
+const TOKEN_FILE = path.join(process.env.DATA_DIR || path.join(__dirname, '../data'), 'shopify_token.json')
 
 let _cachedToken = process.env.SHOPIFY_ACCESS_TOKEN || null
 let _tokenExpiresAt = _cachedToken ? Date.now() + 23 * 60 * 60 * 1000 : 0
 
-// Salvează tokenul în .env pentru a supraviețui repornirilor
-function saveTokenToEnv(token) {
+// Citește tokenul salvat anterior din volum (la startup)
+function loadTokenFromFile() {
   try {
-    let content = fs.readFileSync(ENV_PATH, 'utf8')
-    content = content.includes('SHOPIFY_ACCESS_TOKEN=')
-      ? content.replace(/SHOPIFY_ACCESS_TOKEN=.*/g, `SHOPIFY_ACCESS_TOKEN=${token}`)
-      : content + `\nSHOPIFY_ACCESS_TOKEN=${token}`
-    fs.writeFileSync(ENV_PATH, content, 'utf8')
+    if (fs.existsSync(TOKEN_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TOKEN_FILE, 'utf8'))
+      if (data.token && data.expiresAt && Date.now() < data.expiresAt - 60_000) {
+        _cachedToken = data.token
+        _tokenExpiresAt = data.expiresAt
+      }
+    }
   } catch (_) { }
 }
+
+// Salvează tokenul în volumul persistent (supraviețuiește restart Docker)
+function saveTokenToFile(token, expiresAt) {
+  try {
+    fs.mkdirSync(path.dirname(TOKEN_FILE), { recursive: true })
+    fs.writeFileSync(TOKEN_FILE, JSON.stringify({ token, expiresAt }), 'utf8')
+  } catch (_) { }
+}
+
+// Inițializare — citim tokenul la pornire
+loadTokenFromFile()
 
 // ── Token management ──────────────────────────────────────────────────────────
 async function getShopifyToken() {
@@ -80,7 +94,6 @@ async function getShopifyToken() {
     throw new Error('Shopify credentials not configured')
   }
 
-  console.log('🔄 [AUTH] Fetching NEW Shopify access token...')
   try {
     const resp = await fetch(`https://${SHOPIFY_STORE_URL}/admin/oauth/access_token`, {
       method: 'POST',
@@ -100,7 +113,7 @@ async function getShopifyToken() {
 
     _cachedToken = data.access_token;
     _tokenExpiresAt = Date.now() + (data.expires_in - 300) * 1000;
-    saveTokenToEnv(_cachedToken);
+    saveTokenToFile(_cachedToken, _tokenExpiresAt);
     return _cachedToken;
   } catch (e) {
     console.error('💥 [AUTH] Critical Error:', e.message);
@@ -280,7 +293,6 @@ async function createShopifyDraft(items, shipping, customer) {
 
 // ── Completare Draft → comandă reală ─────────────────────────────────────────
 async function completeShopifyDraft(draftId, orderData) {
-  console.log(`🚀 Finalizing Shopify Draft: ${draftId}...`)
   const token = await getShopifyToken()
   const baseUrl = `https://${SHOPIFY_STORE_URL}/admin/api/${SHOPIFY_API_VERSION}`
   const { customer, items, shipping, total } = orderData
@@ -362,7 +374,6 @@ async function completeShopifyDraft(draftId, orderData) {
 }
 
 async function createShopifyOrder(orderData) {
-  console.log('🚀 Starting Shopify Order creation...')
   const { customer, items, shipping, total } = orderData
   const token = await getShopifyToken()
   const baseUrl = `https://${SHOPIFY_STORE_URL}/admin/api/${SHOPIFY_API_VERSION}`
@@ -467,6 +478,20 @@ async function createShopifyOrder(orderData) {
         }],
 
         note_attributes: [
+          { name: 'Nume și prenume', value: `${firstName} ${lastName}` },
+          { name: 'Telefon', value: intlPhone },
+          { name: 'Adresa', value: customer.address || '' },
+          { name: 'Judet', value: customer.county || '' },
+          { name: 'Localitate', value: customer.city || '' },
+          { name: 'country', value: 'RO' },
+          ...(orderData.tracking?.utm_source ? [{ name: 'utm_source', value: orderData.tracking.utm_source }] : []),
+          ...(orderData.tracking?.utm_medium ? [{ name: 'utm_medium', value: orderData.tracking.utm_medium }] : []),
+          ...(orderData.tracking?.utm_campaign ? [{ name: 'utm_campaign', value: orderData.tracking.utm_campaign }] : []),
+          ...(orderData.tracking?.utm_term ? [{ name: 'utm_term', value: orderData.tracking.utm_term }] : []),
+          ...(orderData.tracking?.utm_content ? [{ name: 'utm_content', value: orderData.tracking.utm_content }] : []),
+          ...(orderData.tracking?.utm_id ? [{ name: 'utm_id', value: orderData.tracking.utm_id }] : []),
+          ...(orderData.tracking?.full_url ? [{ name: 'full_url', value: orderData.tracking.full_url }] : []),
+          { name: 'IP Address', value: orderData.clientIp || '' },
           { name: 'xconnector-key', value: 'nm9ajM64D9' }
         ],
 
@@ -517,9 +542,6 @@ process.on('uncaughtException', (err) => {
 
 // Origini permise — adaugă domeniul tău de producție aici
 const ALLOWED_ORIGINS = [
-  'http://localhost:5173',
-  'http://localhost:4173',
-  'http://localhost:3000',
   process.env.FRONTEND_URL,
 ].filter(Boolean)
 
@@ -576,6 +598,36 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     res.json({ token, user: { username: user.username, role: user.role } })
   } catch (err) {
     res.status(500).json({ error: 'Eroare la autentificare' })
+  }
+})
+
+// GET /api/settings
+app.get('/api/settings', (req, res) => {
+  try {
+    const rows = db.prepare('SELECT * FROM settings').all()
+    const settings = {}
+    rows.forEach(r => { settings[r.key] = r.value })
+    res.json(settings)
+  } catch {
+    res.status(500).json({ error: 'Failed to fetch settings' })
+  }
+})
+
+// PUT /api/settings (Necesită autentificare)
+app.put('/api/settings', authenticateToken, (req, res) => {
+  try {
+    const updates = req.body
+    const updateStmt = db.prepare('INSERT INTO settings (key, value) VALUES (@key, @value) ON CONFLICT(key) DO UPDATE SET value=@value')
+    
+    db.transaction((settingsObj) => {
+      for (const [key, value] of Object.entries(settingsObj)) {
+        updateStmt.run({ key, value: String(value) })
+      }
+    })(updates)
+    
+    res.json({ success: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update settings' })
   }
 })
 
@@ -665,6 +717,8 @@ app.get('/api/orders', authenticateToken, (req, res) => {
 app.post('/api/orders', orderLimiter, async (req, res) => {
   try {
     const orderData = req.body
+    orderData.clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || ''
+    
     const newId = 'IC-' + (Math.floor(Math.random() * 90000) + 10000)
     const now = new Date().toISOString()
 
@@ -725,11 +779,12 @@ app.post('/api/checkout/track', trackLimiter, async (req, res) => {
     const phone = (customer?.phone || '').replace(/\s/g, '')
     const firstName = (customer?.firstName || '').trim()
 
-    console.log(`📡 [TRACK] phone="${phone}" firstName="${firstName}"`)
+    // Maschează datele personale în logs (GDPR)
+    const maskedPhone = phone.length > 4 ? phone.slice(0, 3) + '*'.repeat(phone.length - 4) + phone.slice(-1) : '***'
+    const maskedName = firstName.length > 1 ? firstName[0] + '*'.repeat(firstName.length - 1) : '*'
 
     // Obligatoriu: telefon + prenume
     if (!phone || !firstName) {
-      console.log(`⛔ [TRACK] Rejected — missing phone or firstName`)
       return res.json({ success: false })
     }
 
@@ -769,9 +824,11 @@ setInterval(async () => {
 
         if (!customerObj.firstName || !customerObj.firstName.trim()) continue
 
+        // Dacă a plasat vreo comandă în ultima oră, sigur a fost finalizată și acesta e un "late track event"
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
         const hasRecentOrder = db.prepare(
           `SELECT id FROM orders WHERE customer LIKE ? AND createdAt > ?`
-        ).get(`%${c.id}%`, c.lastActivity)
+        ).get(`%${c.id}%`, oneHourAgo)
 
         if (hasRecentOrder) {
           db.prepare("UPDATE abandoned_checkouts SET status = 'ordered' WHERE id = ?").run(c.id)
@@ -782,7 +839,6 @@ setInterval(async () => {
         if (draftId) {
           db.prepare("UPDATE abandoned_checkouts SET shopifyDraftId = ?, status = 'synced' WHERE id = ?")
             .run(draftId.toString(), c.id)
-          console.log(`✅ [ABANDONED] Draft creat pentru ${c.id}: ${draftId}`)
         }
       } catch (err) {
         console.error(`❌ [ABANDONED] Eroare pentru ${c.id}:`, err.message)
@@ -842,7 +898,6 @@ app.put('/api/orders/:id/status', authenticateToken, async (req, res) => {
                   }
                 })
               })
-              console.log(`✅ [SHOPIFY] Order ${shopifyNumericId} → fulfilled`)
             }
           } catch (e) { console.error('⚠️ [SHOPIFY] Fulfillment sync failed:', e.message) }
         }
@@ -854,7 +909,6 @@ app.put('/api/orders/:id/status', authenticateToken, async (req, res) => {
               headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
               body: JSON.stringify({ reason: 'customer', email: false })
             })
-            console.log(`✅ [SHOPIFY] Order ${shopifyNumericId} → cancelled`)
           } catch (e) { console.error('⚠️ [SHOPIFY] Cancel sync failed:', e.message) }
         }
       }).catch(() => {})

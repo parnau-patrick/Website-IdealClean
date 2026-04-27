@@ -749,8 +749,28 @@ function ProductsTab({ onAdd, onEdit }) {
 
 // ═══════════ INTEGRATIONS TAB ═══════════
 function IntegrationsTab() {
+  const showToast = useToast()
+  const { settings, setSettings, api } = useAppStore()
   const [openFields, setOpenFields] = useState({})
+  
+  // Local state for forms
+  const [fbPixelId, setFbPixelId] = useState(settings.facebookPixelId || '')
+  const [isSaving, setIsSaving] = useState(false)
+
   const toggle = (name) => setOpenFields(prev => ({ ...prev, [name]: !prev[name] }))
+
+  const saveSettings = async () => {
+    setIsSaving(true)
+    try {
+      await api.updateSettings({ facebookPixelId: fbPixelId })
+      setSettings(prev => ({ ...prev, facebookPixelId: fbPixelId }))
+      showToast('Setări salvate cu succes!')
+    } catch (err) {
+      showToast('Eroare la salvare', true)
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   const integrations = [
     {
@@ -799,7 +819,49 @@ function IntegrationsTab() {
               {openFields[intg.key] ? 'Ascunde' : 'Configurează'}
             </button>
           </div>
+          </div>
         ))}
+
+        {/* Facebook Pixel Integration */}
+        <div className="bg-white rounded-2xl border border-slate-100 p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-2xl font-extrabold bg-[#1877F2]">f</div>
+            <div>
+              <h4 className="font-bold">Facebook Pixel</h4>
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${settings.facebookPixelId ? 'bg-emerald-100 text-emerald-600' : 'text-slate-400 bg-slate-100'}`}>
+                {settings.facebookPixelId ? 'Conectat' : 'Neconectat'}
+              </span>
+            </div>
+          </div>
+          <p className="text-sm text-slate-400 mb-4">Adaugă ID-ul Pixelului pentru a urmări evenimentele PageView și Purchase (ca EasySell).</p>
+          
+          {openFields['fbPixel'] && (
+            <div className="space-y-3 mb-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1">Pixel ID (ex: 123456789012345)</label>
+                <input 
+                  type="text" 
+                  placeholder="ID Pixel" 
+                  value={fbPixelId}
+                  onChange={e => setFbPixelId(e.target.value)}
+                  className="w-full p-2.5 border-2 border-slate-200 rounded-xl text-sm focus:border-[#0077B6] outline-none" 
+                />
+              </div>
+              <button 
+                onClick={saveSettings} 
+                disabled={isSaving}
+                className="w-full py-2.5 bg-[#0077B6] text-white text-sm font-semibold rounded-xl hover:bg-[#005f8f] transition-all"
+              >
+                {isSaving ? 'Se salvează...' : 'Salvează Setările'}
+              </button>
+            </div>
+          )}
+          
+          <button onClick={() => toggle('fbPixel')} className="w-full py-2.5 border-2 border-[#0077B6] text-[#0077B6] text-sm font-semibold rounded-xl hover:bg-[#0077B6] hover:text-white transition-all mt-2">
+            {openFields['fbPixel'] ? 'Ascunde' : 'Configurează'}
+          </button>
+        </div>
+
       </div>
     </>
   )

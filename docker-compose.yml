@@ -7,19 +7,12 @@ services:
       dockerfile: Dockerfile
     container_name: idealclean-backend
     restart: unless-stopped
+    env_file:
+      - ./backend/.env
     environment:
       NODE_ENV: production
       PORT: 5000
       DATA_DIR: /app/data
-      # Copiază variabilele din .env (nu include fișierul direct — mai sigur)
-      JWT_SECRET: ${JWT_SECRET}
-      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
-      SHOPIFY_STORE_URL: ${SHOPIFY_STORE_URL}
-      SHOPIFY_ACCESS_TOKEN: ${SHOPIFY_ACCESS_TOKEN}
-      SHOPIFY_API_VERSION: ${SHOPIFY_API_VERSION}
-      SHOPIFY_CLIENT_ID: ${SHOPIFY_CLIENT_ID}
-      SHOPIFY_CLIENT_SECRET: ${SHOPIFY_CLIENT_SECRET}
-      FRONTEND_URL: ${FRONTEND_URL}
     volumes:
       # Volum persistent pentru SQLite — datele supraviețuiesc restart-urilor
       - db_data:/app/data

@@ -12,6 +12,7 @@ export const AppProvider = ({ children }) => {
   const [orders, setOrders] = useState([])
   const [socket, setSocket] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [settings, setSettings] = useState({})
 
   // ── Auth State ──
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ic_user') || 'null'))
@@ -53,6 +54,8 @@ export const AppProvider = ({ children }) => {
     addOrder: (data) => request(`${API_URL}/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
     updateOrderStatus: (id, status, note) => request(`${API_URL}/orders/${id}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status, note }) }),
     deleteOrder: (id) => request(`${API_URL}/orders/${id}`, { method: 'DELETE' }),
+    getSettings: () => request(`${API_URL}/settings`),
+    updateSettings: (data) => request(`${API_URL}/settings`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }),
   }
 
   const logout = () => {
@@ -70,11 +73,58 @@ export const AppProvider = ({ children }) => {
     if (token) api.getOrders().then(setOrders).catch(err => console.error(err))
   }
 
+  // ── Capture Marketing Tracking (UTMs & Full URL) ──
+  useEffect(() => {
+    try {
+      const searchParams = new URLSearchParams(window.location.search)
+      const hasUtm = Array.from(searchParams.keys()).some(k => k.startsWith('utm_') || k === 'fbclid')
+      
+      // Dacă avem parametri de tracking sau nu avem nimic salvat încă
+      if (hasUtm || !localStorage.getItem('ic_tracking')) {
+        const trackingData = {
+          full_url: window.location.href,
+          utm_source: searchParams.get('utm_source') || '',
+          utm_medium: searchParams.get('utm_medium') || '',
+          utm_campaign: searchParams.get('utm_campaign') || '',
+          utm_term: searchParams.get('utm_term') || '',
+          utm_content: searchParams.get('utm_content') || '',
+          utm_id: searchParams.get('utm_id') || '',
+          fbclid: searchParams.get('fbclid') || ''
+        }
+        
+        // Curățăm valorile goale
+        Object.keys(trackingData).forEach(key => !trackingData[key] && delete trackingData[key])
+        
+        // Salvăm doar dacă avem un URL valid sau am găsit utm-uri noi
+        if (hasUtm || !localStorage.getItem('ic_tracking')) {
+          localStorage.setItem('ic_tracking', JSON.stringify(trackingData))
+        }
+      }
+    } catch(e) {}
+  }, [])
+
   useEffect(() => {
     const init = async () => {
       try {
         const p = await api.getProducts()
         setProducts(p)
+        const sData = await api.getSettings().catch(() => ({}))
+        setSettings(sData)
+
+        // Inject Facebook Pixel
+        if (sData.facebookPixelId) {
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', sData.facebookPixelId);
+          fbq('track', 'PageView');
+        }
+
         if (token) {
           const o = await api.getOrders()
           setOrders(o)
@@ -121,7 +171,7 @@ export const AppProvider = ({ children }) => {
   }
 
   return (
-    <AppContext.Provider value={{ products, orders, stats, socket, reloadProducts, reloadOrders, api, user, token, logout, isLoading }}>
+    <AppContext.Provider value={{ products, orders, stats, socket, reloadProducts, reloadOrders, api, user, token, logout, isLoading, settings, setSettings }}>
       {children}
     </AppContext.Provider>
   )

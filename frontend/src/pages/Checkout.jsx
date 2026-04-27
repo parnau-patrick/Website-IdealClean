@@ -208,7 +208,9 @@ export default function Checkout() {
       subtotal,
       shipping,
       total,
-      // Trimitem draftId dacă există (backend-ul va completa draft-ul în loc să creeze unul nou)
+      // Date de marketing pentru Shopify
+      tracking: JSON.parse(localStorage.getItem('ic_tracking') || '{}'),
+      // Trimitem draftId dacă există
       shopifyDraftId: shopifyDraftIdRef.current || null,
     }
 

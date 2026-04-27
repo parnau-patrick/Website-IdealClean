@@ -88,6 +88,19 @@ db.prepare(`
 // Auto-migrate: add exitIntent column for existing databases
 try { db.prepare("ALTER TABLE abandoned_checkouts ADD COLUMN exitIntent INTEGER DEFAULT 0").run() } catch(_) {}
 
+// Create Settings Table
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  )
+`).run()
+
+// Initialize default settings if they don't exist
+try {
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('facebookPixelId', '')").run()
+} catch(_) {}
+
 // Helper functions for reading/writing JSON fields transparently
 const getProducts = () => {
   const rows = db.prepare('SELECT * FROM products ORDER BY createdAt DESC').all()
