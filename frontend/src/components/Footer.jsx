@@ -72,7 +72,7 @@ export default function Footer() {
               {[
                 { icon: '📧', text: 'avidoshop0@gmail.com' },
                 { icon: '📞', text: '0741803646' },
-                { icon: '📍', text: 'București, România' },
+                { icon: '📍', text: 'Baia Mare, România' },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-slate-400 text-sm">
                   <span className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-xs">{item.icon}</span>
