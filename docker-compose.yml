@@ -1,0 +1,61 @@
+services:
+
+  # ── Backend Node.js ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: idealclean-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATA_DIR: /app/data
+      # Copiază variabilele din .env (nu include fișierul direct — mai sigur)
+      JWT_SECRET: ${JWT_SECRET}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD}
+      SHOPIFY_STORE_URL: ${SHOPIFY_STORE_URL}
+      SHOPIFY_ACCESS_TOKEN: ${SHOPIFY_ACCESS_TOKEN}
+      SHOPIFY_API_VERSION: ${SHOPIFY_API_VERSION}
+      SHOPIFY_CLIENT_ID: ${SHOPIFY_CLIENT_ID}
+      SHOPIFY_CLIENT_SECRET: ${SHOPIFY_CLIENT_SECRET}
+      FRONTEND_URL: ${FRONTEND_URL}
+    volumes:
+      # Volum persistent pentru SQLite — datele supraviețuiesc restart-urilor
+      - db_data:/app/data
+    networks:
+      - idealclean-net
+    # Portul 5000 NU e expus public — accesibil doar intern prin Nginx
+    expose:
+      - "5000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Frontend Nginx ────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: idealclean-frontend
+    restart: unless-stopped
+    ports:
+      # Port public — accesibil din exterior
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - idealclean-net
+
+# ── Rețea internă ─────────────────────────────────────────────────────────────
+networks:
+  idealclean-net:
+    driver: bridge
+
+# ── Volume persistente ────────────────────────────────────────────────────────
+volumes:
+  db_data:
+    driver: local
