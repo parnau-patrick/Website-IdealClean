@@ -7,6 +7,8 @@ import Checkout from './pages/Checkout'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
 
+import { Termeni, Confidentialitate, Retur } from './pages/LegalPages'
+
 function PrivateRoute({ children }) {
   const { token, isLoading } = useAppStore()
   const location = useLocation()
@@ -36,6 +38,9 @@ export default function App() {
             <Route path="/produs/:id" element={<ProductPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/termeni-si-conditii" element={<Termeni />} />
+            <Route path="/politica-de-confidentialitate" element={<Confidentialitate />} />
+            <Route path="/politica-de-retur" element={<Retur />} />
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />

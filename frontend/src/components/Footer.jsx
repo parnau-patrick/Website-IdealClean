@@ -55,11 +55,22 @@ export default function Footer() {
           <div>
             <h4 className="text-[12px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-6">Legal</h4>
             <ul className="space-y-3.5">
-              {['Termeni și Condiții', 'Politica de Confidențialitate', 'Politica de Retur', 'ANPC'].map(item => (
-                <li key={item}>
-                  <a href="#" className="text-slate-400 text-sm hover:text-[#5EEAD4] transition-colors duration-300 hover:translate-x-1 inline-block transform">
-                    {item}
-                  </a>
+              {[
+                { label: 'Termeni și Condiții', to: '/termeni-si-conditii' },
+                { label: 'Politica de Confidențialitate', to: '/politica-de-confidentialitate' },
+                { label: 'Politica de Retur', to: '/politica-de-retur' },
+                { label: 'ANPC', href: 'https://anpc.ro/' }
+              ].map(item => (
+                <li key={item.label}>
+                  {item.href ? (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" className="text-slate-400 text-sm hover:text-[#5EEAD4] transition-colors duration-300 hover:translate-x-1 inline-block transform">
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link to={item.to} onClick={() => window.scrollTo(0,0)} className="text-slate-400 text-sm hover:text-[#5EEAD4] transition-colors duration-300 hover:translate-x-1 inline-block transform">
+                      {item.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -83,9 +94,20 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between text-[13px] text-slate-500 gap-3">
-          <span>&copy; 2026 IdealClean. Toate drepturile rezervate.</span>
-          <span>Creat cu 💙 în România</span>
+        <div className="border-t border-white/5 pt-6 flex flex-col md:flex-row items-center justify-between text-[13px] text-slate-500 gap-6">
+          <div className="flex flex-col gap-2">
+            <span>&copy; {new Date().getFullYear()} IdealClean. Toate drepturile rezervate.</span>
+            <span>Creat cu 💙 în România</span>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="noopener noreferrer">
+              <img src="https://wp.anpc.ro/wp-content/uploads/2022/05/sal-anpc-2.jpg" alt="ANPC SAL" className="h-12 w-auto object-contain rounded-lg" />
+            </a>
+            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
+              <img src="https://wp.anpc.ro/wp-content/uploads/2022/05/sol-anpc-2.jpg" alt="ANPC SOL" className="h-12 w-auto object-contain rounded-lg" />
+            </a>
+          </div>
         </div>
       </div>
     </footer>
