@@ -70,8 +70,8 @@ export default function Footer() {
             <h4 className="text-[12px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-6">Contact</h4>
             <ul className="space-y-4">
               {[
-                { icon: '📧', text: 'contact@idealclean.ro' },
-                { icon: '📞', text: '0770 123 456' },
+                { icon: '📧', text: 'avidoshop0@gmail.com' },
+                { icon: '📞', text: '0741803646' },
                 { icon: '📍', text: 'București, România' },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-slate-400 text-sm">
