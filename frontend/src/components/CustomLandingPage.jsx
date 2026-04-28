@@ -283,7 +283,7 @@ function HeroSection({ product, cfg, THEME, discount, savings, timeLeft, qty, se
 
           {/* ── Image Side ── */}
           <div className="order-1 lg:order-1">
-            <HeroGallery images={product.images} heroImage={cfg.heroImage} name={product.name} THEME={THEME} discount={discount} />
+            <HeroGallery images={product.images} heroImage={cfg.heroImage} name={product.name} THEME={THEME} discount={discount} showDiscount={product.config?.showDiscount !== false} />
           </div>
 
           {/* ── Info Side ── */}
@@ -437,7 +437,7 @@ function HeroSection({ product, cfg, THEME, discount, savings, timeLeft, qty, se
 }
 
 /* ── Hero Gallery ── */
-function HeroGallery({ images = [], heroImage, name, THEME, discount }) {
+function HeroGallery({ images = [], heroImage, name, THEME, discount, showDiscount = true }) {
   const [active, setActive] = useState(0)
   // Folosim ordinea exactă a imaginilor din array-ul `images` pentru a respecta Drag & Drop-ul din dashboard.
   // Dacă există un heroImage setat separat care nu e în imagini, îl punem, altfel folosim doar lista ordonată.
@@ -465,7 +465,7 @@ function HeroGallery({ images = [], heroImage, name, THEME, discount }) {
   return (
     <div className="relative group">
       {/* Discount badge */}
-      {discount > 0 && (
+      {discount > 0 && showDiscount && (
         <div className="absolute top-4 left-4 z-20 px-3 py-1.5 rounded-xl text-white text-sm font-black shadow-lg"
           style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
           -{discount}%
