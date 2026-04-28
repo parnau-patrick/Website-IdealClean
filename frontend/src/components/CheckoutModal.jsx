@@ -170,6 +170,16 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
     // ✅ Arată SUCCESS INSTANT — nu așteptăm API-ul
     setShowSuccess(true)
 
+    // ✅ Declanșare Facebook Pixel Purchase Event
+    if (window.fbq) {
+      window.fbq('track', 'Purchase', {
+        currency: 'RON',
+        value: total,
+        content_name: product.name,
+        content_ids: [product.id]
+      })
+    }
+
     // 🔄 Trimite comanda în background (fire & forget)
     api.addOrder(orderPayload).catch(err => {
       console.error('Background order error:', err)
