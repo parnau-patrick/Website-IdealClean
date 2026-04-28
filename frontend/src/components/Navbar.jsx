@@ -23,7 +23,7 @@ export default function Navbar({ transparent = false }) {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 relative z-10">
             <img src="/logo.webp" alt="IdealClean" className="h-14 w-auto drop-shadow-sm" />
-            <span className="font-['Outfit'] text-[1.35rem] font-[900] tracking-tight hidden sm:block">
+            <span className="font-['Outfit'] text-[1.1rem] sm:text-[1.35rem] font-[900] tracking-tight block">
               <span className="text-[#0077B6]">Ideal</span><span className="text-slate-700">Clean</span>
             </span>
           </Link>
