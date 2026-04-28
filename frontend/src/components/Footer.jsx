@@ -100,12 +100,12 @@ export default function Footer() {
             <span>Creat cu 💙 în România</span>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <div className="flex flex-col sm:flex-row items-center gap-4 border-t border-slate-800/50 pt-8 mt-4">
             <a href="https://anpc.ro/ce-este-sal/" target="_blank" rel="noopener noreferrer">
-              <img src="https://wp.anpc.ro/wp-content/uploads/2022/05/sal-anpc-2.jpg" alt="ANPC SAL" className="h-12 w-auto object-contain rounded-lg" />
+              <img src="/anpc-sal.svg" alt="ANPC SAL" className="h-12 w-auto object-contain rounded-lg" />
             </a>
             <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">
-              <img src="https://wp.anpc.ro/wp-content/uploads/2022/05/sol-anpc-2.jpg" alt="ANPC SOL" className="h-12 w-auto object-contain rounded-lg" />
+              <img src="/anpc-sol.svg" alt="ANPC SOL" className="h-12 w-auto object-contain rounded-lg" />
             </a>
           </div>
         </div>
