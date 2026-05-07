@@ -451,7 +451,7 @@ function HeroGallery({ images = [], heroImage, name, THEME, discount, showDiscou
   }
 
   const scrollTo = i => {
-    document.getElementById(`lp-gallery-${i}`)?.scrollIntoView({ behavior: 'smooth', inline: 'start' })
+    document.getElementById(`lp-gallery-${i}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
   }
 
   if (allImages.length === 0) {
