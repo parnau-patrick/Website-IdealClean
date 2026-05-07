@@ -18,6 +18,26 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
   const { api } = useAppStore()
   const [selectedBundle, setSelectedBundle] = useState(0)
   const [form, setForm] = useState({ name: '', phone: '', address: '', judet: '', localitate: '' })
+  const [selectedColor, setSelectedColor] = useState(() => {
+    if (product?.config?.hasColors && product?.config?.colorsList) {
+      const colors = product.config.colorsList.split(',').map(c => c.trim()).filter(Boolean)
+      return colors[0] || null
+    }
+    return null
+  })
+
+  // Sincronizează culoarea dacă produsul se schimbă
+  useEffect(() => {
+    if (product?.config?.hasColors && product?.config?.colorsList) {
+      const colors = product.config.colorsList.split(',').map(c => c.trim()).filter(Boolean)
+      if (colors.length > 0 && !colors.includes(selectedColor)) {
+        setSelectedColor(colors[0])
+      }
+    } else {
+      setSelectedColor(null)
+    }
+  }, [product])
+
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -47,7 +67,7 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
       productId: product.id,
       productName: product.name,
       bundleLabel: currentBundle.label || '1x buc',
-      color: product.selectedColor || null,
+      color: selectedColor || null,
       qty: currentBundle.qty || 1,
       price: currentBundle.price,
       originalUnitPrice: currentBundle.oldPrice ? (currentBundle.oldPrice / (currentBundle.qty || 1)) : (currentBundle.price / (currentBundle.qty || 1)),
@@ -145,7 +165,7 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
         productId: product.id,
         productName: product.name,
         bundleLabel: currentBundle.label || '1x buc',
-        color: product.selectedColor || null,
+        color: selectedColor || null,
         qty: currentBundle.qty,
         price: currentBundle.price,
         originalUnitPrice: currentBundle.oldPrice ? (currentBundle.oldPrice / (currentBundle.qty || 1)) : (currentBundle.price / (currentBundle.qty || 1)),
@@ -202,7 +222,7 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
               <span className="text-slate-400">Produs</span>
               <span className="font-semibold text-right">
                 {currentBundle.qty}x {product.name}
-                {product.selectedColor && ` (${product.selectedColor})`}
+                {selectedColor && ` (${selectedColor})`}
               </span>
             </div>
             <div className="flex justify-between text-sm mb-1"><span className="text-slate-400">Total</span><span className="font-bold text-emerald-600">{total.toFixed(2)} lei</span></div>
@@ -291,6 +311,33 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
             {errors.localitate && <p className="text-xs text-red-500 mt-1 ml-1">{errors.localitate}</p>}
           </div>
 
+          {/* ─── SELECȚIE CULOARE ─── */}
+          {product?.config?.hasColors && product?.config?.colorsList && (
+            <div>
+              <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                Alege Culoarea <span className="text-red-400">*</span>
+              </label>
+              <div className="flex flex-wrap gap-2.5">
+                {product.config.colorsList.split(',').map(c => c.trim()).filter(Boolean).map((color, idx) => {
+                  const isSelected = selectedColor === color
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedColor(color)}
+                      className={`px-5 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
+                        isSelected 
+                          ? 'border-[#0077B6] bg-[#0077B6]/10 text-[#0077B6] scale-105 shadow-md' 
+                          : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {/* ─── Bundle Selector ─── */}
           <div className="space-y-3 pt-2">
             {bundles.map((bundle, i) => (
@@ -338,7 +385,6 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
               <span className="text-slate-400">Produs</span>
               <span className="font-semibold text-slate-700 text-right">
                 {currentBundle.qty}x {product.name}
-                {product.selectedColor && <span className="block text-xs text-[#0077B6] mt-0.5">Culoare: {product.selectedColor}</span>}
               </span>
             </div>
             <div className="flex justify-between text-sm">

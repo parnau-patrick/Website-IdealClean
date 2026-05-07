@@ -42,14 +42,7 @@ export default function CustomLandingPage({ product }) {
   const [qty, setQty] = useState(1)
   const [stickyVisible, setStickyVisible] = useState(false)
   
-  // Default la prima culoare dacă are culori
-  const [selectedColor, setSelectedColor] = useState(() => {
-    if (product.config?.hasColors && product.config?.colorsList) {
-      const colors = product.config.colorsList.split(',').map(c => c.trim()).filter(Boolean)
-      return colors[0] || null
-    }
-    return null
-  })
+
 
   const [viewerCount, setViewerCount] = useState(() => Math.floor(Math.random() * 60) + 40)
   const [viewerFlash, setViewerFlash] = useState(false)
@@ -98,7 +91,7 @@ export default function CustomLandingPage({ product }) {
   return (
     <div className="min-h-screen bg-white font-['Inter'] text-slate-800 overflow-x-hidden">
       <CheckoutModal
-        product={{ ...product, qty, selectedColor }}
+        product={{ ...product, qty }}
         isOpen={showCheckout}
         onClose={() => setShowCheckout(false)}
       />
@@ -139,8 +132,6 @@ export default function CustomLandingPage({ product }) {
           timeLeft={timeLeft}
           qty={qty}
           setQty={setQty}
-          selectedColor={selectedColor}
-          setSelectedColor={setSelectedColor}
           viewerCount={viewerCount}
           viewerFlash={viewerFlash}
           onBuy={() => setShowCheckout(true)}
@@ -269,7 +260,7 @@ function LandingNavbar({ theme }) {
 /* ═══════════════════════════════════════════════════════════
    HERO SECTION
 ═══════════════════════════════════════════════════════════ */
-function HeroSection({ product, cfg, THEME, discount, savings, timeLeft, qty, setQty, selectedColor, setSelectedColor, viewerCount, viewerFlash, onBuy, pad, buyBtnRef }) {
+function HeroSection({ product, cfg, THEME, discount, savings, timeLeft, qty, setQty, viewerCount, viewerFlash, onBuy, pad, buyBtnRef }) {
   return (
     <section className="relative overflow-hidden">
       {/* Background */}
@@ -370,32 +361,7 @@ function HeroSection({ product, cfg, THEME, discount, savings, timeLeft, qty, se
               </ul>
             )}
 
-            {/* ── SELECȚIE CULOARE ── */}
-            {product.config?.hasColors && product.config?.colorsList && (
-              <div className="pt-2">
-                <label className="block text-sm font-black text-slate-900 mb-3 uppercase tracking-wide">
-                  Alege Culoarea:
-                </label>
-                <div className="flex flex-wrap gap-2.5">
-                  {product.config.colorsList.split(',').map(c => c.trim()).filter(Boolean).map((color, idx) => {
-                    const isSelected = selectedColor === color
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedColor(color)}
-                        className={`px-5 py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${
-                          isSelected 
-                            ? 'border-[#0077B6] bg-[#0077B6]/10 text-[#0077B6] scale-105 shadow-md' 
-                            : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'
-                        }`}
-                      >
-                        {color}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            )}
+
 
             {/* Hero CTA — tracked by IntersectionObserver to trigger sticky bar on mobile */}
             <div ref={buyBtnRef} className="pt-2">

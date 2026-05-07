@@ -253,8 +253,8 @@ async function createShopifyDraft(items, shipping, customer) {
   const rawPhone = ((customer?.phone || '')).replace(/\s/g, '')
   const intlPhone = rawPhone.startsWith('40') ? '+' + rawPhone
     : rawPhone.startsWith('0') ? '+4' + rawPhone
-    : rawPhone.startsWith('+') ? rawPhone
-    : '+40' + rawPhone
+      : rawPhone.startsWith('+') ? rawPhone
+        : '+40' + rawPhone
 
   const draftPayload = {
     line_items: lineItems,
@@ -632,13 +632,13 @@ app.put('/api/settings', authenticateToken, (req, res) => {
   try {
     const updates = req.body
     const updateStmt = db.prepare('INSERT INTO settings (key, value) VALUES (@key, @value) ON CONFLICT(key) DO UPDATE SET value=@value')
-    
+
     db.transaction((settingsObj) => {
       for (const [key, value] of Object.entries(settingsObj)) {
         updateStmt.run({ key, value: String(value) })
       }
     })(updates)
-    
+
     res.json({ success: true })
   } catch (err) {
     res.status(500).json({ error: 'Failed to update settings' })
@@ -732,7 +732,7 @@ app.post('/api/orders', orderLimiter, async (req, res) => {
   try {
     const orderData = req.body
     orderData.clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || ''
-    
+
     const newId = 'IC-' + (Math.floor(Math.random() * 90000) + 10000)
     const now = new Date().toISOString()
 
@@ -925,7 +925,7 @@ app.put('/api/orders/:id/status', authenticateToken, async (req, res) => {
             })
           } catch (e) { console.error('⚠️ [SHOPIFY] Cancel sync failed:', e.message) }
         }
-      }).catch(() => {})
+      }).catch(() => { })
     }
     // ─────────────────────────────────────────────────────────────────────────
 
