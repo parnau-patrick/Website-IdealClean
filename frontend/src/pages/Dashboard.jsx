@@ -1124,6 +1124,30 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                 <FormInput label="Stoc" name="stock" type="number" value={form.stock} onChange={handleChange} />
               </div>
 
+              {/* ── Descrieri Produs ── */}
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700">Descriere Scurtă <span className="text-slate-400 font-normal">(apare sub produs în magazin)</span></label>
+                <textarea
+                  name="shortDescription"
+                  value={form.shortDescription}
+                  onChange={handleChange}
+                  rows={2}
+                  placeholder="Ex: Curățenie impecabilă pentru întreaga casă."
+                  className="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-[#0077B6] outline-none resize-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1.5 text-slate-700">Descriere Completă <span className="text-slate-400 font-normal">(textul albastru de sub titlu pe pagina produsului)</span></label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Ex: Formula concentrată pentru curățenie perfectă. Elimină 99.9% din bacterii și lasă un parfum proaspăt de durată."
+                  className="w-full p-3 border-2 border-slate-200 rounded-xl text-sm focus:border-[#0077B6] outline-none resize-none"
+                />
+              </div>
+
               {/* ── Shopify Variant ID ── */}
               <div className="flex items-start gap-3 p-4 bg-[#96bf48]/8 border border-[#96bf48]/30 rounded-xl">
                 <span className="text-2xl flex-shrink-0">🛍️</span>
