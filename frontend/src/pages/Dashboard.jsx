@@ -29,9 +29,9 @@ export default function Dashboard() {
 
   const { products, orders, stats, api, reloadProducts, reloadOrders, user, logout } = useAppStore()
   const tabConfig = {
-    overview:     { title: 'Prezentare Generală', subtitle: 'Bine ai revenit! Iată ce se întâmplă azi.' },
-    orders:       { title: 'Comenzi', subtitle: 'Gestionează toate comenzile magazinului tău.' },
-    products:     { title: 'Produse', subtitle: 'Adaugă, editează și gestionează produsele.' },
+    overview: { title: 'Prezentare Generală', subtitle: 'Bine ai revenit! Iată ce se întâmplă azi.' },
+    orders: { title: 'Comenzi', subtitle: 'Gestionează toate comenzile magazinului tău.' },
+    products: { title: 'Produse', subtitle: 'Adaugă, editează și gestionează produsele.' },
     integrations: { title: 'Integrări', subtitle: 'Conectează servicii externe pentru AWB și facturare.' },
   }
 
@@ -105,9 +105,9 @@ export default function Dashboard() {
         </header>
 
         <div className="p-6 lg:p-8">
-          {tab === 'overview'     && <OverviewTab onViewOrder={setOrderModal} onSwitchTab={switchTab} />}
-          {tab === 'orders'       && <OrdersTab filter={orderFilter} setFilter={setOrderFilter} onViewOrder={setOrderModal} />}
-          {tab === 'products'     && <ProductsTab onAdd={() => { setEditingProduct(null); setProductModal(true) }} onEdit={(p) => { setEditingProduct(p); setProductModal(true) }} />}
+          {tab === 'overview' && <OverviewTab onViewOrder={setOrderModal} onSwitchTab={switchTab} />}
+          {tab === 'orders' && <OrdersTab filter={orderFilter} setFilter={setOrderFilter} onViewOrder={setOrderModal} />}
+          {tab === 'products' && <ProductsTab onAdd={() => { setEditingProduct(null); setProductModal(true) }} onEdit={(p) => { setEditingProduct(p); setProductModal(true) }} />}
           {tab === 'integrations' && <IntegrationsTab />}
         </div>
       </main>
@@ -202,7 +202,7 @@ function ProductStatsView({ orders }) {
   // Aggregate by product name
   const statsMap = {}
   filtered.forEach(order => {
-    ;(order.items || []).forEach(item => {
+    ; (order.items || []).forEach(item => {
       const name = item.productName || item.name || 'Produs necunoscut'
       if (!statsMap[name]) {
         statsMap[name] = { name, units: 0, revenue: 0, orders: 0, statuses: {} }
@@ -219,12 +219,12 @@ function ProductStatsView({ orders }) {
 
   let stats = Object.values(statsMap)
   if (sortBy === 'revenue') stats.sort((a, b) => b.revenue - a.revenue)
-  if (sortBy === 'units')   stats.sort((a, b) => b.units - a.units)
-  if (sortBy === 'orders')  stats.sort((a, b) => b.orders - a.orders)
+  if (sortBy === 'units') stats.sort((a, b) => b.units - a.units)
+  if (sortBy === 'orders') stats.sort((a, b) => b.orders - a.orders)
 
   const maxRevenue = stats[0]?.revenue || 1
   const totalRevenue = stats.reduce((s, p) => s + p.revenue, 0)
-  const totalUnits   = stats.reduce((s, p) => s + p.units, 0)
+  const totalUnits = stats.reduce((s, p) => s + p.units, 0)
 
   const PERIOD_LABELS = { all: 'Tot timpul', month: 'Luna aceasta', today: 'Azi' }
 
@@ -339,8 +339,8 @@ function ProductStatsView({ orders }) {
   )
 }
 
-const MONTH_NAMES = ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie']
-const DAY_NAMES   = ['Lun','Mar','Mie','Joi','Vin','Sâm','Dum']
+const MONTH_NAMES = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie']
+const DAY_NAMES = ['Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm', 'Dum']
 
 function CalendarTab({ onViewOrder, productFilter = 'all' }) {
   const { orders: allOrders } = useAppStore()
@@ -350,7 +350,7 @@ function CalendarTab({ onViewOrder, productFilter = 'all' }) {
 
   const toKey = (d) => {
     const dt = new Date(d)
-    return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+    return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
   }
 
   // Apply product filter
@@ -368,10 +368,10 @@ function CalendarTab({ onViewOrder, productFilter = 'all' }) {
 
   // Build calendar grid
   const firstDay = new Date(cur.y, cur.m, 1)
-  const lastDay  = new Date(cur.y, cur.m + 1, 0)
+  const lastDay = new Date(cur.y, cur.m + 1, 0)
   // Monday-first: shift Sunday (0) → 6
   const startOffset = (firstDay.getDay() + 6) % 7
-  const totalCells  = Math.ceil((startOffset + lastDay.getDate()) / 7) * 7
+  const totalCells = Math.ceil((startOffset + lastDay.getDate()) / 7) * 7
 
   const cells = Array.from({ length: totalCells }, (_, i) => {
     const dayNum = i - startOffset + 1
@@ -380,7 +380,7 @@ function CalendarTab({ onViewOrder, productFilter = 'all' }) {
   })
 
   const prev = () => setCur(c => c.m === 0 ? { y: c.y - 1, m: 11 } : { y: c.y, m: c.m - 1 })
-  const next = () => setCur(c => c.m === 11 ? { y: c.y + 1, m: 0  } : { y: c.y, m: c.m + 1 })
+  const next = () => setCur(c => c.m === 11 ? { y: c.y + 1, m: 0 } : { y: c.y, m: c.m + 1 })
 
   const selectedOrders = selected ? (byDay[selected] || []) : []
   const selectedRevenue = selectedOrders.reduce((s, o) => s + (o.total || 0), 0)
@@ -432,7 +432,7 @@ function CalendarTab({ onViewOrder, productFilter = 'all' }) {
         <div className="grid grid-cols-7">
           {cells.map((day, i) => {
             if (!day) return <div key={i} className="aspect-square p-1 bg-slate-50/40" />
-            const key = `${cur.y}-${String(cur.m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+            const key = `${cur.y}-${String(cur.m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
             const dayOrders = byDay[key] || []
             const rev = dayOrders.reduce((s, o) => s + (o.total || 0), 0)
             const dotColor = getDotColor(dayOrders.length, rev)
@@ -477,9 +477,9 @@ function CalendarTab({ onViewOrder, productFilter = 'all' }) {
 
         {/* Legend */}
         <div className="flex items-center justify-center gap-5 py-4 border-t border-slate-50 text-xs text-slate-400 flex-wrap px-4">
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"/><b>1–3 comenzi</b></span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0077B6] inline-block"/><b>+200 lei</b></span>
-          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"/><b>+500 lei</b></span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" /><b>1–3 comenzi</b></span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0077B6] inline-block" /><b>+200 lei</b></span>
+          <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block" /><b>+500 lei</b></span>
         </div>
       </div>
 
@@ -598,21 +598,18 @@ function OrdersTab({ filter, setFilter, onViewOrder }) {
         <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
           <button
             onClick={() => setView('list')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              view === 'list' ? 'bg-white text-[#0077B6] shadow-sm' : 'text-slate-400 hover:text-slate-600'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'list' ? 'bg-white text-[#0077B6] shadow-sm' : 'text-slate-400 hover:text-slate-600'
+              }`}
           >📋 Listă</button>
           <button
             onClick={() => setView('calendar')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              view === 'calendar' ? 'bg-white text-[#0077B6] shadow-sm' : 'text-slate-400 hover:text-slate-600'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'calendar' ? 'bg-white text-[#0077B6] shadow-sm' : 'text-slate-400 hover:text-slate-600'
+              }`}
           >📅 Calendar</button>
           <button
             onClick={() => setView('products')}
-            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-              view === 'products' ? 'bg-white text-[#0077B6] shadow-sm' : 'text-slate-400 hover:text-slate-600'
-            }`}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${view === 'products' ? 'bg-white text-[#0077B6] shadow-sm' : 'text-slate-400 hover:text-slate-600'
+              }`}
           >📊 Produse</button>
         </div>
         {view === 'list' && (
@@ -752,7 +749,7 @@ function IntegrationsTab() {
   const showToast = useToast()
   const { settings, setSettings, api } = useAppStore()
   const [openFields, setOpenFields] = useState({})
-  
+
   // Local state for forms
   const [fbPixelId, setFbPixelId] = useState(settings.facebookPixelId || '')
   const [isSaving, setIsSaving] = useState(false)
@@ -833,21 +830,21 @@ function IntegrationsTab() {
             </div>
           </div>
           <p className="text-sm text-slate-400 mb-4">Adaugă ID-ul Pixelului pentru a urmări evenimentele PageView și Purchase (ca EasySell).</p>
-          
+
           {openFields['fbPixel'] && (
             <div className="space-y-3 mb-4">
               <div>
                 <label className="block text-xs font-semibold mb-1">Pixel ID (ex: 123456789012345)</label>
-                <input 
-                  type="text" 
-                  placeholder="ID Pixel" 
+                <input
+                  type="text"
+                  placeholder="ID Pixel"
                   value={fbPixelId}
                   onChange={e => setFbPixelId(e.target.value)}
-                  className="w-full p-2.5 border-2 border-slate-200 rounded-xl text-sm focus:border-[#0077B6] outline-none" 
+                  className="w-full p-2.5 border-2 border-slate-200 rounded-xl text-sm focus:border-[#0077B6] outline-none"
                 />
               </div>
-              <button 
-                onClick={saveSettings} 
+              <button
+                onClick={saveSettings}
                 disabled={isSaving}
                 className="w-full py-2.5 bg-[#0077B6] text-white text-sm font-semibold rounded-xl hover:bg-[#005f8f] transition-all"
               >
@@ -855,7 +852,7 @@ function IntegrationsTab() {
               </button>
             </div>
           )}
-          
+
           <button onClick={() => toggle('fbPixel')} className="w-full py-2.5 border-2 border-[#0077B6] text-[#0077B6] text-sm font-semibold rounded-xl hover:bg-[#0077B6] hover:text-white transition-all mt-2">
             {openFields['fbPixel'] ? 'Ascunde' : 'Configurează'}
           </button>
@@ -1154,15 +1151,15 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                   <span className="text-sm font-semibold text-slate-700">Produsul are mai multe culori?</span>
                 </label>
               </div>
-              
+
               {config.hasColors && (
                 <div className="p-4 border border-[#0077B6]/20 bg-[#0077B6]/5 rounded-xl mb-4">
-                  <FormInput 
-                    label="Culori Disponibile (separate prin virgulă) *" 
-                    name="colorsList" 
-                    value={config.colorsList || ''} 
-                    onChange={e => setConfig({ ...config, colorsList: e.target.value })} 
-                    placeholder="Ex: Roșu, Albastru, Negru Elegant" 
+                  <FormInput
+                    label="Culori Disponibile (separate prin virgulă) *"
+                    name="colorsList"
+                    value={config.colorsList || ''}
+                    onChange={e => setConfig({ ...config, colorsList: e.target.value })}
+                    placeholder="Ex: Roșu, Albastru, Negru Elegant"
                   />
                   <p className="text-[11px] text-slate-500 mt-1">Clienții vor alege obligatoriu una din aceste culori pe pagină, și va fi trimisă în comandă.</p>
                 </div>
@@ -1280,6 +1277,45 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                   Toate produsele folosesc <strong>un singur template landing page</strong>.
                   Personalizează textele, imaginile și culorile pentru fiecare produs individual de mai jos.
                 </span>
+              </div>
+
+              {/* ── Beneficii Produs (Features) ── */}
+              <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="font-bold text-emerald-800 text-sm flex items-center gap-2">
+                    ✅ Beneficii Produs
+                    <span className="text-[11px] font-semibold bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full">
+                      {form.features.split('\n').filter(f => f.trim()).length} bife
+                    </span>
+                  </h4>
+                  <span className="text-[11px] text-emerald-600">afișate cu ✓ pe pagina produsului</span>
+                </div>
+                <textarea
+                  name="features"
+                  value={form.features}
+                  onChange={handleChange}
+                  rows={6}
+                  placeholder={"Formula concentrată — randament dublu\nElimină 99.9% bacterii\nParfum proaspăt de lungă durată\nSigur pentru toate suprafețele\nBiodegradabil & Eco-friendly\n🚚 Livrare RAPIDĂ — Plata la livrare (RAMBURS)"}
+                  className="w-full p-3 border border-emerald-200 rounded-xl text-sm font-mono focus:border-emerald-500 outline-none resize-none bg-white leading-relaxed"
+                />
+                <p className="text-[11px] text-emerald-600 mt-1.5 font-medium">
+                  Un beneficiu per linie. Poți folosi emoji la început (ex: 🚚 Livrare RAPIDĂ).
+                </p>
+                {form.features.split('\n').filter(f => f.trim()).length > 0 && (
+                  <div className="mt-3 p-3 bg-white rounded-xl border border-emerald-100">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Previzualizare:</p>
+                    <ul className="space-y-1.5">
+                      {form.features.split('\n').filter(f => f.trim()).map((f, i) => (
+                        <li key={i} className="flex items-center gap-2 text-sm text-slate-700">
+                          <span className="w-5 h-5 rounded bg-[#0077B6] flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-[10px] font-bold">✓</span>
+                          </span>
+                          {f.trim()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {/* Section Toggles */}
@@ -1640,8 +1676,8 @@ function ProductFormModal({ product, onClose, onSave, api }) {
 
                     <div className="flex items-center gap-2 mb-3">
                       <span className={`px-2 auto text-xs font-bold rounded text-white ${r.type === 'facebook' ? 'bg-blue-600'
-                          : r.type === 'photo_review' ? 'bg-pink-500'
-                            : 'bg-slate-800'
+                        : r.type === 'photo_review' ? 'bg-pink-500'
+                          : 'bg-slate-800'
                         }`}>
                         {r.type === 'facebook' ? 'Facebook Comment' : r.type === 'photo_review' ? '📸 Photo Card Review' : 'Client Grid Review'}
                       </span>
