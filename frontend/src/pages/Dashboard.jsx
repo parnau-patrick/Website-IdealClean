@@ -1496,7 +1496,7 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                 {/* Custom text for details section */}
                 <div className="p-4 bg-white rounded-xl border-2 border-slate-200 space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="block text-sm font-semibold text-slate-700">Text Detalii <span className="text-slate-400 font-normal">(un rând = o bifă)</span></label>
+                    <label className="block text-sm font-semibold text-slate-700">Text Detalii <span className="text-slate-400 font-normal">(liber, formatează cum vrei)</span></label>
                     <div className="flex flex-col items-center gap-1">
                       <label className="text-[10px] font-bold text-slate-400 uppercase">Culoare text</label>
                       <input type="color" name="detailsTextColor" value={landingConfig.detailsTextColor || '#FFFFFF'} onChange={handleLandingChange} className="w-9 h-9 rounded-lg cursor-pointer border-2 border-slate-200 p-0.5" />
@@ -1506,26 +1506,11 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                     name="detailsFeatures"
                     value={landingConfig.detailsFeatures || ''}
                     onChange={handleLandingChange}
-                    rows={6}
-                    placeholder={"Textură cu zimți pentru putere maximă\nMicrofibră moale și delicată\nSigură pentru toate suprafețele\nAbsorbție rapidă a lichidelor"}
-                    className="w-full p-3 border border-slate-200 rounded-xl text-sm font-mono focus:border-[#0077B6] outline-none resize-none bg-slate-50 leading-relaxed"
+                    rows={8}
+                    placeholder={"Scrie orice text vrei aici.\nPoți folosi emoji: ✅ Calitate premium\nSau pur și simplu propoziții normale.\n\nTextul va apărea exact cum îl scrii."}
+                    className="w-full p-3 border border-slate-200 rounded-xl text-sm font-mono focus:border-[#0077B6] outline-none resize-y bg-slate-50 leading-relaxed"
                   />
-                  <p className="text-[11px] text-slate-400 font-medium">Un punct per linie. Poți folosi emoji la început (ex: ✅ Calitate premium).</p>
-                  {(landingConfig.detailsFeatures || '').split('\n').filter(f => f.trim()).length > 0 && (
-                    <div className="mt-2 p-3 rounded-xl border border-slate-100" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Previzualizare:</p>
-                      <ul className="space-y-1.5">
-                        {(landingConfig.detailsFeatures || '').split('\n').filter(f => f.trim()).map((f, i) => (
-                          <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
-                            <span className="w-5 h-5 rounded-full bg-[#0077B6]/20 flex items-center justify-center flex-shrink-0">
-                              <span className="text-[#0077B6] text-[10px] font-bold">✓</span>
-                            </span>
-                            {f.trim()}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  <p className="text-[11px] text-slate-400 font-medium">Textul apare exact cum îl scrii — fără bife adăugate automat.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1.5">Imagine Grafică Detalii (opțional)</label>

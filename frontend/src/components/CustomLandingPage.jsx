@@ -614,22 +614,15 @@ function ProductDetailsSection({ product, cfg, THEME }) {
           {/* Features list */}
           <div className={`transition-all duration-700 delay-100 ${inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/20">
-              <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm">✓</span>
+              <h3 className="text-white font-bold text-lg mb-6">
                 {cfg.detailsBenefitsTitle || 'Beneficii Principale'}
               </h3>
-              <ul className="space-y-4">
-                {(cfg.detailsFeatures
-                  ? cfg.detailsFeatures.split('\n').filter(f => f.trim())
-                  : (product.features || [])
-                ).map((f, i) => (
-                  <li key={i} className={`flex items-start gap-3 transition-all duration-500 ${inView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
-                    style={{ transitionDelay: `${200 + i * 80}ms` }}>
-                    <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-white text-xs font-black flex-shrink-0 mt-0.5">✓</span>
-                    <span className="leading-relaxed text-[15px]" style={{ color: cfg.detailsTextColor || '#FFFFFF' }}>{f.trim()}</span>
-                  </li>
-                ))}
-              </ul>
+              <p
+                className="leading-relaxed text-[15px] whitespace-pre-wrap"
+                style={{ color: cfg.detailsTextColor || '#FFFFFF' }}
+              >
+                {cfg.detailsFeatures || product.features?.join('\n') || ''}
+              </p>
             </div>
           </div>
 
