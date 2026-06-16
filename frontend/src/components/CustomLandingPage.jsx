@@ -558,8 +558,8 @@ function SpecialistsSection({ cfg, THEME }) {
                 👨‍⚕️
               </div>
               <div className="text-left">
-                <div className="font-bold text-sm" style={{ color: cfg.specVerifiedTitle || '#1e293b' }}>Specialiști Verificați</div>
-                <div className="text-xs mt-0.5" style={{ color: cfg.specVerifiedSub || '#94a3b8' }}>Recomandare bazată pe rezultate reale</div>
+                <div className="font-bold text-sm" style={{ color: cfg.specVerifiedTitle || '#1e293b' }}>{cfg.specVerifiedName || 'Specialiști Verificați'}</div>
+                <div className="text-xs mt-0.5" style={{ color: cfg.specVerifiedSub || '#94a3b8' }}>{cfg.specVerifiedSubtitle || 'Recomandare bazată pe rezultate reale'}</div>
               </div>
               <div className="ml-auto flex">
                 {[...Array(5)].map((_, i) => <span key={i} className="text-amber-400 text-lg">★</span>)}

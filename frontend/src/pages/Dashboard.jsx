@@ -970,6 +970,7 @@ function ProductFormModal({ product, onClose, onSave, api }) {
     specTitle: 'CE SPUN SPECIALIȘTII', specText: 'Soluție modernă și non-invazivă...', specImage: '',
     specTitleColor: '#0F172A', specTextColor: '#64748B', specBadgeBg: '',
     specVerifiedTitle: '#1e293b', specVerifiedSub: '#94a3b8',
+    specVerifiedName: '', specVerifiedSubtitle: '',
     detailsTitle: 'Detalii Produs 📋', detailsSubtitle: 'Tot ce trebuie să știi', detailsImage: '',
     detailsTitleColor: '#FFFFFF', detailsSubtitleColor: '#FFFFFF', detailsTextColor: '#FFFFFF',
     detailsBenefitsTitle: 'Beneficii Principale', detailsFeatures: '',
@@ -1450,6 +1451,23 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                     <label className="text-[10px] font-bold text-slate-400 uppercase text-center">Culoare Text</label>
                     <input type="color" name="specTextColor" value={landingConfig.specTextColor || '#64748B'} onChange={handleLandingChange} className="w-10 h-10 rounded-lg cursor-pointer border-2 border-slate-200 p-0.5" />
                   </div>
+                </div>
+                {/* Verified card custom text */}
+                <div className="grid sm:grid-cols-2 gap-3 p-3 bg-white rounded-xl border border-slate-200">
+                  <FormInput
+                    label="Nume Specialist / Titlu casetă"
+                    name="specVerifiedName"
+                    value={landingConfig.specVerifiedName || ''}
+                    onChange={handleLandingChange}
+                    placeholder="Ex: Dr. Ionescu Maria"
+                  />
+                  <FormInput
+                    label="Subtitlu casetă"
+                    name="specVerifiedSubtitle"
+                    value={landingConfig.specVerifiedSubtitle || ''}
+                    onChange={handleLandingChange}
+                    placeholder="Ex: Medic Dermatolog, 15 ani experiență"
+                  />
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="flex-1">
