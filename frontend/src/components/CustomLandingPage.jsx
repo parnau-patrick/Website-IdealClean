@@ -616,7 +616,7 @@ function ProductDetailsSection({ product, cfg, THEME }) {
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/20">
               <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
                 <span className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm">✓</span>
-                Beneficii Principale
+                {cfg.detailsBenefitsTitle || 'Beneficii Principale'}
               </h3>
               <ul className="space-y-4">
                 {product.features?.map((f, i) => (

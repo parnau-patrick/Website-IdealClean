@@ -972,6 +972,7 @@ function ProductFormModal({ product, onClose, onSave, api }) {
     specVerifiedTitle: '#1e293b', specVerifiedSub: '#94a3b8',
     detailsTitle: 'Detalii Produs 📋', detailsSubtitle: 'Tot ce trebuie să știi', detailsImage: '',
     detailsTitleColor: '#FFFFFF', detailsSubtitleColor: '#FFFFFF', detailsTextColor: '#FFFFFF',
+    detailsBenefitsTitle: 'Beneficii Principale',
     storyTitle: 'Povestea Corinei', storyText: 'Mereu am fost complexată...', storyImgLeft: '', storyImgRight: '',
     storyTitleColor: '#FFFFFF', storyTextColor: '#475569',
     photoReviewsBg: '#f1f5f9',
@@ -1485,6 +1486,11 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                       <label className="text-[10px] font-bold text-slate-400 uppercase">Culoare</label>
                       <input type="color" name="detailsSubtitleColor" value={landingConfig.detailsSubtitleColor || '#FFFFFF'} onChange={handleLandingChange} className="w-10 h-10 rounded-lg cursor-pointer border-2 border-slate-200 p-0.5" />
                     </div>
+                  </div>
+                </div>
+                <div className="flex items-end gap-3">
+                  <div className="flex-1">
+                    <FormInput label="Titlu Beneficii (cutia albă)" name="detailsBenefitsTitle" value={landingConfig.detailsBenefitsTitle || 'Beneficii Principale'} onChange={handleLandingChange} placeholder="Ex: Beneficii Principale" />
                   </div>
                 </div>
                 <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
