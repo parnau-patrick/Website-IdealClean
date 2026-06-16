@@ -239,6 +239,24 @@ async function findOrCreateShopifyCustomer(customer, token) {
   return null
 }
 
+// ── Helper pentru nota Shopify (Observații + Culoare) ─────────────────────────
+function buildShopifyNote(customer, items) {
+  let noteParts = []
+  if (customer?.notes && customer.notes.trim() !== '') {
+    noteParts.push(`Observații client: ${customer.notes.trim()}`)
+  }
+  
+  const coloredItems = (items || []).filter(item => item.color)
+  if (coloredItems.length === 1) {
+    noteParts.push(`Culoare: ${coloredItems[0].color}`)
+  } else if (coloredItems.length > 1) {
+    const colorsStr = coloredItems.map(item => `${item.productName || 'Produs'}: ${item.color}`).join(', ')
+    noteParts.push(`Culori: ${colorsStr}`)
+  }
+  
+  return noteParts.join('\n') || null
+}
+
 // ── Creare Draft Order (checkout abandonat) ─────────────────────────────────────
 async function createShopifyDraft(items, shipping, customer) {
   const token = await getShopifyToken()
@@ -274,6 +292,7 @@ async function createShopifyDraft(items, shipping, customer) {
         : '+40' + rawPhone
 
   const draftPayload = {
+    note: buildShopifyNote(customer, items),
     line_items: lineItems,
     shipping_line: {
       title: Number(shipping) > 0 ? 'Transport RAPID' : 'Transport GRATUIT',
@@ -351,17 +370,21 @@ async function completeShopifyDraft(draftId, orderData) {
     const numericId = vId && typeof vId === 'string' && vId.includes('/') ? vId.split('/').pop() : vId
     const label = item.bundleLabel ? ` (${item.bundleLabel})` : ''
 
+    const payload = {}
     if (numericId) {
-      return {
-        variant_id: parseInt(numericId),
-        quantity: item.qty || 1
-      }
+      payload.variant_id = parseInt(numericId)
+      payload.quantity = item.qty || 1
+    } else {
+      payload.title = `${item.productName || 'Produs'}${label}`
+      payload.price = (item.price / (item.qty || 1)).toFixed(2)
+      payload.quantity = item.qty || 1
     }
-    return {
-      title: `${item.productName || 'Produs'}${label}`,
-      price: (item.price / (item.qty || 1)).toFixed(2),
-      quantity: item.qty || 1,
+
+    if (item.color) {
+      payload.properties = [{ name: 'Culoare', value: item.color }]
     }
+
+    return payload
   })
 
   // Actualizează draft-ul cu datele finale ale clientului
@@ -370,6 +393,7 @@ async function completeShopifyDraft(draftId, orderData) {
     headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
     body: JSON.stringify({
       draft_order: {
+        note: buildShopifyNote(customer, items),
         line_items: lineItems,
         shipping_address: address,
         billing_address: address,
@@ -471,6 +495,7 @@ async function createShopifyOrder(orderData) {
     headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
     body: JSON.stringify({
       order: {
+        note: buildShopifyNote(customer, items),
         email: customer.email || null,
         phone: intlPhone,
 
