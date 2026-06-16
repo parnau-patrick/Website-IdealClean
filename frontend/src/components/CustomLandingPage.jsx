@@ -766,60 +766,9 @@ function FacebookReviewsSection({ reviews, THEME }) {
 
 /* ═══════════════════════════════════════════════════════════
    CLIENT GRID REVIEWS
-═══════════════════════════════════════════════════════════ */
-function ClientReviewsSection({ reviews, THEME }) {
-  const [ref, inView] = useInView()
-  return (
-    <section ref={ref} className="py-16 sm:py-20 lg:py-24 bg-white overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-12 transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-          <h2 className="font-['Outfit'] text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            Recenzii Clienți Reali 🤩
-          </h2>
-          <p className="text-slate-400 mt-3 text-base">Rezultate reale de la clienții noștri</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-          {reviews.map((r, i) => (
-            <div
-              key={i}
-              className={`bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ${inView ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              {/* Photo — natural proportions, zero cropping */}
-              <div className="overflow-hidden">
-                {r.image
-                  ? <img src={r.image} alt={r.name} className="w-full h-auto block" />
-                  : <div className="w-full flex items-center justify-center text-5xl py-12">📸</div>
-                }
-              </div>
-
-              <div className="p-5">
-                {/* Stars */}
-                <div className="flex items-center gap-1 mb-3">
-                  {[...Array(5)].map((_, j) => (
-                    <span key={j} className={`text-lg ${j < r.rating ? 'text-amber-400' : 'text-slate-200'}`}>★</span>
-                  ))}
-                </div>
-
-                {/* Quote */}
-                <p className="text-slate-600 text-sm leading-relaxed italic mb-4">
-                  "{r.text.length > 100 ? r.text.substring(0, 97) + '...' : r.text}"
-                </p>
-
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-3 border-t border-slate-50">
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-                    style={{ background: `linear-gradient(135deg, ${THEME}, ${THEME}80)` }}
-                  >
-                    {r.name?.[0] || 'C'}
-                  </div>
-                  <span className="font-bold text-sm text-slate-700">{r.name}</span>
-                  <span className="ml-auto text-xs text-emerald-600 font-semibold flex items-center gap-1">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[8px]">✓</span>
-                    Verificat
-                  </span>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</span>
+                  <span className="text-xs text-emerald-600 font-semibold">Cumpărător verificat</span>
                 </div>
               </div>
             </div>
@@ -830,9 +779,6 @@ function ClientReviewsSection({ reviews, THEME }) {
   )
 }
 
-/* ═══════════════════════════════════════════════════════════
-   FINAL CTA SECTION
-═══════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════
    PHOTO CARD REVIEWS
 ═══════════════════════════════════════════════════════════ */
@@ -877,9 +823,36 @@ function PhotoReviewsSection({ reviews, bgColor, cfg }) {
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* ── MOBILE: horizontal snap carousel ── */}
+      <div className="sm:hidden overflow-x-auto pb-4" style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+        <div className="flex gap-4 px-4">
+          {reviews.map((r, i) => (
+            <div
+              key={i}
+              className="flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100"
+              style={{ width: 'calc(85vw)', scrollSnapAlign: 'center' }}
+            >
+              {r.image && <img src={r.image} alt={r.name || 'Review'} className="w-full h-auto block" draggable={false} />}
+              <div className="p-5 text-center">
+                {r.title && <h3 className="font-['Outfit'] font-black text-lg mb-2" style={{ color: cfg?.photoReviewsCardTitleColor || '#0f172a' }}>{r.title}</h3>}
+                <div className="flex justify-center gap-0.5 mb-3">
+                  {[...Array(5)].map((_, j) => <span key={j} className={`text-xl ${j < (r.rating || 5) ? 'text-amber-400' : 'text-slate-200'}`}>★</span>)}
+                </div>
+                {r.text && <p className="text-sm leading-relaxed mb-4" style={{ color: cfg?.photoReviewsCardTextColor || '#475569' }}>{r.text}</p>}
+                <p className="font-bold text-sm mb-3" style={{ color: cfg?.photoReviewsCardNameColor || '#1e293b' }}>- {r.name}</p>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</span>
+                  <span className="text-xs text-emerald-600 font-semibold">Cumpărător verificat</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── TABLET / DESKTOP: grid ── */}
+      <div className="hidden sm:block max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {reviews.map((r, i) => (
             <div
               key={i}
