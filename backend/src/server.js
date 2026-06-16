@@ -140,8 +140,25 @@ async function findOrCreateShopifyCustomer(customer, token) {
     phone: intlPhone,
   }
 
-  async function updateCustomerAddress(customerId) {
+  async function updateCustomerProfileAndAddress(customerId) {
     try {
+      // 1. Update main profile (first name, last name, email)
+      const customerUpdatePayload = {
+        first_name: customer.firstName || '',
+        last_name: customer.lastName || '',
+      }
+      if (customer.email && customer.email.trim() !== '') {
+        customerUpdatePayload.email = customer.email.trim()
+      }
+      await fetch(`${baseUrl}/customers/${customerId}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token },
+        body: JSON.stringify({ customer: customerUpdatePayload }),
+      })
+    } catch (_) { }
+
+    try {
+      // 2. Update or create default address
       const addrResp = await fetch(
         `${baseUrl}/customers/${customerId}/addresses.json?limit=1`,
         { headers: { 'X-Shopify-Access-Token': token } }
@@ -175,7 +192,7 @@ async function findOrCreateShopifyCustomer(customer, token) {
         const d = await r.json()
         if (d.customers?.length > 0) {
           const found = d.customers[0]
-          await updateCustomerAddress(found.id)
+          await updateCustomerProfileAndAddress(found.id)
           return `gid://shopify/Customer/${found.id}`
         }
       }
@@ -212,7 +229,7 @@ async function findOrCreateShopifyCustomer(customer, token) {
       if (retryResp.ok) {
         const retryData = await retryResp.json()
         if (retryData.customers?.length > 0) {
-          await updateCustomerAddress(retryData.customers[0].id)
+          await updateCustomerProfileAndAddress(retryData.customers[0].id)
           return `gid://shopify/Customer/${retryData.customers[0].id}`
         }
       }

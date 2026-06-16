@@ -450,6 +450,7 @@ function Input({ label, value, onChange, ...props }) {
         {...props}
         value={value}
         onChange={onChange}
+        autoComplete="off"
         className="w-full p-3 border-2 border-slate-200 rounded-xl focus:border-[#0077B6] focus:ring-4 focus:ring-[#0077B6]/10 outline-none transition-all"
       />
     </div>
