@@ -9,7 +9,7 @@ const API_URL = '/api'
 
 export default function Checkout() {
   const [searchParams] = useSearchParams()
-  const { products: allProducts } = useAppStore()
+  const { products: allProducts, settings } = useAppStore()
 
   const [orderPlaced, setOrderPlaced] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -59,7 +59,8 @@ export default function Checkout() {
   }).filter(Boolean)
 
   const subtotal = items.reduce((s, i) => s + i.subtotal, 0)
-  const shipping = subtotal >= 150 ? 0 : 19.99
+  const shippingCost = Number(settings.shippingCost !== undefined ? settings.shippingCost : 19.99)
+  const shipping = subtotal >= 150 ? 0 : shippingCost
   const total = subtotal + shipping
 
   // ── Funcție de tracking (checkout abandonat) ─────────────────────────────────

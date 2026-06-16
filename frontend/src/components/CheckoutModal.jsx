@@ -11,11 +11,9 @@ const JUDETE = [
   'Vaslui', 'Vâlcea', 'Vrancea'
 ]
 
-const TRANSPORT_COST = 20
-
 export default function CheckoutModal({ product, isOpen, onClose }) {
   const showToast = useToast()
-  const { api } = useAppStore()
+  const { api, settings } = useAppStore()
   const [selectedBundle, setSelectedBundle] = useState(0)
   const [form, setForm] = useState({ name: '', phone: '', address: '', judet: '', localitate: '' })
   const [selectedColor, setSelectedColor] = useState(() => {
@@ -59,7 +57,8 @@ export default function CheckoutModal({ product, isOpen, onClose }) {
 
   const currentBundle = bundles[selectedBundle] || bundles[0]
   const subtotal = Number(currentBundle?.price || 0)
-  const currentShippingCost = currentBundle?.freeShipping ? 0 : TRANSPORT_COST
+  const shippingCost = Number(settings?.shippingCost !== undefined ? settings.shippingCost : 20)
+  const currentShippingCost = currentBundle?.freeShipping ? 0 : shippingCost
   const total = subtotal + currentShippingCost
 
   const buildTrackPayload = (currentForm = form) => ({

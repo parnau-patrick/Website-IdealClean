@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppStore } from '../context/AppProvider'
 import { useToast } from '../components/Toast'
@@ -752,7 +752,13 @@ function IntegrationsTab() {
 
   // Local state for forms
   const [fbPixelId, setFbPixelId] = useState(settings.facebookPixelId || '')
+  const [shippingCost, setShippingCost] = useState(settings.shippingCost || '19.99')
   const [isSaving, setIsSaving] = useState(false)
+  const [isSavingShipping, setIsSavingShipping] = useState(false)
+
+  useEffect(() => {
+    if (settings.shippingCost !== undefined) setShippingCost(settings.shippingCost)
+  }, [settings])
 
   const toggle = (name) => setOpenFields(prev => ({ ...prev, [name]: !prev[name] }))
 
@@ -766,6 +772,19 @@ function IntegrationsTab() {
       showToast('Eroare la salvare', true)
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const saveShippingSettings = async () => {
+    setIsSavingShipping(true)
+    try {
+      await api.updateSettings({ shippingCost })
+      setSettings(prev => ({ ...prev, shippingCost }))
+      showToast('Setări transport salvate cu succes!')
+    } catch (err) {
+      showToast('Eroare la salvare', true)
+    } finally {
+      setIsSavingShipping(false)
     }
   }
 
@@ -855,6 +874,47 @@ function IntegrationsTab() {
 
           <button onClick={() => toggle('fbPixel')} className="w-full py-2.5 border-2 border-[#0077B6] text-[#0077B6] text-sm font-semibold rounded-xl hover:bg-[#0077B6] hover:text-white transition-all mt-2">
             {openFields['fbPixel'] ? 'Ascunde' : 'Configurează'}
+          </button>
+        </div>
+
+        {/* Shipping Settings */}
+        <div className="bg-white rounded-2xl border border-slate-100 p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-2xl font-extrabold bg-[#0077B6]">🚚</div>
+            <div>
+              <h4 className="font-bold">Setări Transport</h4>
+              <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                Cost: {settings.shippingCost || '19.99'} lei
+              </span>
+            </div>
+          </div>
+          <p className="text-sm text-slate-400 mb-4">Configurează costul standard de livrare pentru comenzi.</p>
+
+          {openFields['shipping'] && (
+            <div className="space-y-3 mb-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1">Cost Transport (lei)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Ex: 19.99"
+                  value={shippingCost}
+                  onChange={e => setShippingCost(e.target.value)}
+                  className="w-full p-2.5 border-2 border-slate-200 rounded-xl text-sm focus:border-[#0077B6] outline-none"
+                />
+              </div>
+              <button
+                onClick={saveShippingSettings}
+                disabled={isSavingShipping}
+                className="w-full py-2.5 bg-[#0077B6] text-white text-sm font-semibold rounded-xl hover:bg-[#005f8f] transition-all"
+              >
+                {isSavingShipping ? 'Se salvează...' : 'Salvează Setările'}
+              </button>
+            </div>
+          )}
+
+          <button onClick={() => toggle('shipping')} className="w-full py-2.5 border-2 border-[#0077B6] text-[#0077B6] text-sm font-semibold rounded-xl hover:bg-[#0077B6] hover:text-white transition-all mt-2">
+            {openFields['shipping'] ? 'Ascunde' : 'Configurează'}
           </button>
         </div>
 

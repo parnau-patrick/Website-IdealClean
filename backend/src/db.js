@@ -45,9 +45,9 @@ db.prepare(`
 `).run()
 
 // Auto-migrate if needed
-try { db.prepare("ALTER TABLE products ADD COLUMN landingConfig TEXT").run() } catch(e) {}
-try { db.prepare("ALTER TABLE products ADD COLUMN reviews TEXT").run() } catch(e) {}
-try { db.prepare("ALTER TABLE products ADD COLUMN config TEXT").run() } catch(e) {}
+try { db.prepare("ALTER TABLE products ADD COLUMN landingConfig TEXT").run() } catch (e) { }
+try { db.prepare("ALTER TABLE products ADD COLUMN reviews TEXT").run() } catch (e) { }
+try { db.prepare("ALTER TABLE products ADD COLUMN config TEXT").run() } catch (e) { }
 
 // Create Orders Table
 db.prepare(`
@@ -86,7 +86,7 @@ db.prepare(`
 `).run()
 
 // Auto-migrate: add exitIntent column for existing databases
-try { db.prepare("ALTER TABLE abandoned_checkouts ADD COLUMN exitIntent INTEGER DEFAULT 0").run() } catch(_) {}
+try { db.prepare("ALTER TABLE abandoned_checkouts ADD COLUMN exitIntent INTEGER DEFAULT 0").run() } catch (_) { }
 
 // Create Settings Table
 db.prepare(`
@@ -99,7 +99,8 @@ db.prepare(`
 // Initialize default settings if they don't exist
 try {
   db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('facebookPixelId', '')").run()
-} catch(_) {}
+  db.prepare("INSERT OR IGNORE INTO settings (key, value) VALUES ('shippingCost', '19.99')").run()
+} catch (_) { }
 
 // Helper functions for reading/writing JSON fields transparently
 const getProducts = () => {
@@ -146,7 +147,7 @@ const seedProducts = () => {
 
     const stmt = db.prepare(`INSERT INTO products (id, name, slug, price, oldPrice, category, stock, shortDescription, description, features, bundles, images, landingConfig, reviews, active, createdAt) 
       VALUES (@id, @name, @slug, @price, @oldPrice, @category, @stock, @shortDescription, @description, @features, @bundles, @images, @landingConfig, @reviews, @active, @createdAt)`)
-    
+
     const insertMany = db.transaction((prods) => {
       for (const p of prods) {
         stmt.run({
