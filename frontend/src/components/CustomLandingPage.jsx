@@ -920,12 +920,10 @@ function PhotoReviewsSection({ reviews, bgColor, cfg }) {
           <div
             key={i}
             onClick={() => scrollTo(i)}
-            className="flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-xl border border-white/80 transition-all duration-300 cursor-pointer"
+            className="flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-xl border border-white/80"
             style={{
               width: '280px',
               scrollSnapAlign: 'center',
-              transform: active === i ? 'scale(1.02)' : 'scale(0.97)',
-              opacity: active === i ? 1 : 0.75,
             }}
           >
             {/* Photo */}
