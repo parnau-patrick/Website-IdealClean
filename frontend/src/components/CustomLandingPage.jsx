@@ -838,33 +838,9 @@ function ClientReviewsSection({ reviews, THEME }) {
 ═══════════════════════════════════════════════════════════ */
 function PhotoReviewsSection({ reviews, bgColor, cfg }) {
   const [ref, inView] = useInView()
-  const [active, setActive] = React.useState(0)
-  const trackRef = React.useRef(null)
-
-  const scrollTo = (idx) => {
-    const track = trackRef.current
-    if (!track) return
-    const card = track.children[idx]
-    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-    setActive(idx)
-  }
-
-  const onScroll = () => {
-    const track = trackRef.current
-    if (!track) return
-    const center = track.scrollLeft + track.clientWidth / 2
-    let closest = 0
-    Array.from(track.children).forEach((child, i) => {
-      const cardCenter = child.offsetLeft + child.offsetWidth / 2
-      if (Math.abs(cardCenter - center) < Math.abs(track.children[closest].offsetLeft + track.children[closest].offsetWidth / 2 - center)) {
-        closest = i
-      }
-    })
-    setActive(closest)
-  }
 
   return (
-    <section ref={ref} className="py-14 sm:py-20 overflow-hidden" style={{ background: bgColor || '#f1f5f9' }}>
+    <section ref={ref} className="py-14 sm:py-20" style={{ background: bgColor || '#f1f5f9' }}>
 
       {/* Header */}
       <div className={`text-center mb-12 px-4 transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
@@ -901,82 +877,46 @@ function PhotoReviewsSection({ reviews, bgColor, cfg }) {
         </div>
       </div>
 
-      {/* Carousel track */}
-      <div
-        ref={trackRef}
-        onScroll={onScroll}
-        className="flex gap-4 overflow-x-auto pb-4 px-4 sm:px-8"
-        style={{
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        {/* Spacer left */}
-        <div className="flex-shrink-0 w-[calc(50vw-140px)] sm:w-[calc(50vw-160px)]" />
-
-        {reviews.map((r, i) => (
-          <div
-            key={i}
-            onClick={() => scrollTo(i)}
-            className="flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-xl border border-white/80"
-            style={{
-              width: '280px',
-              scrollSnapAlign: 'center',
-            }}
-          >
-            {/* Photo */}
-            {r.image && (
-              <img src={r.image} alt={r.name || 'Review'} className="w-full h-auto block" draggable={false} />
-            )}
-
-            {/* Content */}
-            <div className="p-5 text-center">
-              {r.title && (
-                <h3 className="font-['Outfit'] font-black text-lg mb-2"
-                  style={{ color: cfg?.photoReviewsCardTitleColor || '#0f172a' }}>{r.title}</h3>
+      {/* Grid */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {reviews.map((r, i) => (
+            <div
+              key={i}
+              className={`bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100 transition-all duration-500 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              {/* Photo */}
+              {r.image && (
+                <img src={r.image} alt={r.name || 'Review'} className="w-full h-auto block" draggable={false} />
               )}
-              <div className="flex justify-center gap-0.5 mb-3">
-                {[...Array(5)].map((_, j) => (
-                  <span key={j} className={`text-xl ${j < (r.rating || 5) ? 'text-amber-400' : 'text-slate-200'}`}>★</span>
-                ))}
-              </div>
-              {r.text && (
-                <p className="text-sm leading-relaxed mb-4"
-                  style={{ color: cfg?.photoReviewsCardTextColor || '#475569' }}>{r.text}</p>
-              )}
-              <p className="font-bold text-sm mb-3"
-                style={{ color: cfg?.photoReviewsCardNameColor || '#1e293b' }}>- {r.name}</p>
-              <div className="flex items-center justify-center gap-1.5">
-                <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</span>
-                <span className="text-xs text-emerald-600 font-semibold">Cumpărător verificat</span>
+
+              {/* Content */}
+              <div className="p-5 text-center">
+                {r.title && (
+                  <h3 className="font-['Outfit'] font-black text-lg mb-2"
+                    style={{ color: cfg?.photoReviewsCardTitleColor || '#0f172a' }}>{r.title}</h3>
+                )}
+                <div className="flex justify-center gap-0.5 mb-3">
+                  {[...Array(5)].map((_, j) => (
+                    <span key={j} className={`text-xl ${j < (r.rating || 5) ? 'text-amber-400' : 'text-slate-200'}`}>★</span>
+                  ))}
+                </div>
+                {r.text && (
+                  <p className="text-sm leading-relaxed mb-4"
+                    style={{ color: cfg?.photoReviewsCardTextColor || '#475569' }}>{r.text}</p>
+                )}
+                <p className="font-bold text-sm mb-3"
+                  style={{ color: cfg?.photoReviewsCardNameColor || '#1e293b' }}>- {r.name}</p>
+                <div className="flex items-center justify-center gap-1.5">
+                  <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px]">✓</span>
+                  <span className="text-xs text-emerald-600 font-semibold">Cumpărător verificat</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-        {/* Spacer right */}
-        <div className="flex-shrink-0 w-[calc(50vw-140px)] sm:w-[calc(50vw-160px)]" />
-      </div>
-
-      {/* Dot indicators */}
-      {reviews.length > 1 && (
-        <div className="flex justify-center gap-2 mt-5">
-          {reviews.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => scrollTo(i)}
-              className="transition-all duration-300 rounded-full"
-              style={{
-                width: active === i ? '24px' : '8px',
-                height: '8px',
-                background: active === i ? '#0077B6' : '#cbd5e1',
-              }}
-            />
           ))}
         </div>
-      )}
+      </div>
     </section>
   )
 }
