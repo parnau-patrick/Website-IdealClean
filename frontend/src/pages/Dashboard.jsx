@@ -972,7 +972,7 @@ function ProductFormModal({ product, onClose, onSave, api }) {
     specVerifiedTitle: '#1e293b', specVerifiedSub: '#94a3b8',
     detailsTitle: 'Detalii Produs 📋', detailsSubtitle: 'Tot ce trebuie să știi', detailsImage: '',
     detailsTitleColor: '#FFFFFF', detailsSubtitleColor: '#FFFFFF', detailsTextColor: '#FFFFFF',
-    detailsBenefitsTitle: 'Beneficii Principale',
+    detailsBenefitsTitle: 'Beneficii Principale', detailsFeatures: '',
     storyTitle: 'Povestea Corinei', storyText: 'Mereu am fost complexată...', storyImgLeft: '', storyImgRight: '',
     storyTitleColor: '#FFFFFF', storyTextColor: '#475569',
     photoReviewsBg: '#f1f5f9',
@@ -1490,12 +1490,42 @@ function ProductFormModal({ product, onClose, onSave, api }) {
                 </div>
                 <div className="flex items-end gap-3">
                   <div className="flex-1">
-                    <FormInput label="Titlu Beneficii (cutia albă)" name="detailsBenefitsTitle" value={landingConfig.detailsBenefitsTitle || 'Beneficii Principale'} onChange={handleLandingChange} placeholder="Ex: Beneficii Principale" />
+                    <FormInput label="Titlu cutie (ex: Beneficii Principale)" name="detailsBenefitsTitle" value={landingConfig.detailsBenefitsTitle || 'Beneficii Principale'} onChange={handleLandingChange} placeholder="Ex: Beneficii Principale" />
                   </div>
                 </div>
-                <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-200">
-                  <div className="flex-1 text-sm font-semibold text-slate-700">Culoare Text Beneficii (Lista)</div>
-                  <input type="color" name="detailsTextColor" value={landingConfig.detailsTextColor || '#FFFFFF'} onChange={handleLandingChange} className="w-10 h-10 rounded-lg cursor-pointer border-2 border-slate-200 p-0.5" />
+                {/* Custom text for details section */}
+                <div className="p-4 bg-white rounded-xl border-2 border-slate-200 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-semibold text-slate-700">Text Detalii <span className="text-slate-400 font-normal">(un rând = o bifă)</span></label>
+                    <div className="flex flex-col items-center gap-1">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Culoare text</label>
+                      <input type="color" name="detailsTextColor" value={landingConfig.detailsTextColor || '#FFFFFF'} onChange={handleLandingChange} className="w-9 h-9 rounded-lg cursor-pointer border-2 border-slate-200 p-0.5" />
+                    </div>
+                  </div>
+                  <textarea
+                    name="detailsFeatures"
+                    value={landingConfig.detailsFeatures || ''}
+                    onChange={handleLandingChange}
+                    rows={6}
+                    placeholder={"Textură cu zimți pentru putere maximă\nMicrofibră moale și delicată\nSigură pentru toate suprafețele\nAbsorbție rapidă a lichidelor"}
+                    className="w-full p-3 border border-slate-200 rounded-xl text-sm font-mono focus:border-[#0077B6] outline-none resize-none bg-slate-50 leading-relaxed"
+                  />
+                  <p className="text-[11px] text-slate-400 font-medium">Un punct per linie. Poți folosi emoji la început (ex: ✅ Calitate premium).</p>
+                  {(landingConfig.detailsFeatures || '').split('\n').filter(f => f.trim()).length > 0 && (
+                    <div className="mt-2 p-3 rounded-xl border border-slate-100" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Previzualizare:</p>
+                      <ul className="space-y-1.5">
+                        {(landingConfig.detailsFeatures || '').split('\n').filter(f => f.trim()).map((f, i) => (
+                          <li key={i} className="flex items-center gap-2 text-sm text-slate-600">
+                            <span className="w-5 h-5 rounded-full bg-[#0077B6]/20 flex items-center justify-center flex-shrink-0">
+                              <span className="text-[#0077B6] text-[10px] font-bold">✓</span>
+                            </span>
+                            {f.trim()}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-1.5">Imagine Grafică Detalii (opțional)</label>
