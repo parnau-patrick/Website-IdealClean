@@ -228,6 +228,17 @@ export default function Checkout() {
         throw new Error(data.error || 'Eroare la plasarea comenzii')
       }
 
+      // ✅ Declanșare Facebook Pixel Purchase Event
+      if (window.fbq) {
+        window.fbq('track', 'Purchase', {
+          currency: 'RON',
+          value: total,
+          content_name: items.map(i => i.product?.name).join(', '),
+          content_ids: items.map(i => i.productId),
+          content_type: 'product'
+        })
+      }
+
       clearCart()
       setOrderPlaced({ id: data.id })
     } catch (err) {
